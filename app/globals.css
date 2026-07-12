@@ -1,0 +1,243 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #05060a;
+  --surface: #0b0e16;
+  --surface-2: #12172390;
+  --border: #232a3a;
+  --text: #f2f5ff;
+  --muted: #8b93a7;
+  --pink: #ff2e93;
+  --cyan: #3be8ff;
+  --green: #a5f70a;
+  --yellow: #ffd400;
+}
+
+* {
+  border-color: var(--border);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+::selection {
+  background-color: var(--pink);
+  color: #fff;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #05060a;
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(var(--pink), var(--cyan));
+  border-radius: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── layering ── */
+.bg-canvas-wrap {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.content-layer {
+  position: relative;
+  z-index: 2;
+}
+
+/* custom crosshair cursor (desktop) */
+.cursor-none,
+.cursor-none * {
+  cursor: none !important;
+}
+
+/* On precise pointers, let clicks in empty gutters reach the 3D city
+   (so buildings become clickable) while keeping UI interactive. */
+@media (pointer: fine) {
+  .bg-canvas-wrap {
+    pointer-events: auto;
+  }
+  .content-layer {
+    pointer-events: none;
+  }
+  .content-layer a,
+  .content-layer button,
+  .content-layer input,
+  .content-layer textarea,
+  .content-layer select,
+  .content-layer label,
+  .content-layer .hud-panel,
+  .content-layer .mission-card,
+  .content-layer .phone-frame {
+    pointer-events: auto;
+  }
+}
+
+/* WASTED screen desaturation (scene + content only, HUD/banner stay vivid) */
+.wasted-fx .content-layer,
+.wasted-fx .bg-canvas-wrap {
+  filter: grayscale(0.9) sepia(0.25) contrast(1.1) brightness(0.75);
+  transition: filter 0.5s ease;
+}
+
+/* subtle scanline / vignette overlay for the whole page (game screen feel) */
+.screen-fx {
+  position: fixed;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.55) 100%),
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.03) 0px,
+      rgba(255, 255, 255, 0.03) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+  mix-blend-mode: overlay;
+  opacity: 0.5;
+}
+
+/* ── typography helpers ── */
+.gta-title {
+  font-family: var(--font-display), Impact, sans-serif;
+  letter-spacing: 0.5px;
+  line-height: 0.92;
+  text-transform: uppercase;
+}
+
+.hud-label {
+  font-family: var(--font-mono), monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+
+.neon-pink {
+  color: var(--pink);
+  text-shadow: 0 0 12px rgba(255, 46, 147, 0.7), 0 0 40px rgba(255, 46, 147, 0.35);
+}
+.neon-cyan {
+  color: var(--cyan);
+  text-shadow: 0 0 12px rgba(59, 232, 255, 0.7), 0 0 40px rgba(59, 232, 255, 0.35);
+}
+.neon-yellow {
+  color: var(--yellow);
+  text-shadow: 0 0 12px rgba(255, 212, 0, 0.7), 0 0 40px rgba(255, 212, 0, 0.35);
+}
+
+/* GTA loading-screen style diagonal stripes */
+.gta-stripes {
+  background: repeating-linear-gradient(
+    115deg,
+    #ff2e93 0 60px,
+    #3be8ff 60px 120px,
+    #ffd400 120px 180px,
+    #a5f70a 180px 240px
+  );
+}
+
+/* glassy HUD panel */
+.hud-panel {
+  background: linear-gradient(
+    180deg,
+    rgba(18, 23, 35, 0.72),
+    rgba(8, 10, 16, 0.72)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+/* angled / skewed HUD chip like GTA money bar */
+.hud-chip {
+  clip-path: polygon(8% 0, 100% 0, 92% 100%, 0% 100%);
+}
+
+.section-pad {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 6rem 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .section-pad {
+    padding: 7rem 4rem;
+  }
+}
+
+/* wanted star glow */
+.wanted-star {
+  filter: drop-shadow(0 0 6px rgba(255, 212, 0, 0.85));
+}
+
+/* mission card hover */
+.mission-card {
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.mission-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--pink);
+  box-shadow: 0 0 0 1px rgba(255, 46, 147, 0.4),
+    0 20px 50px rgba(255, 46, 147, 0.18);
+}
+
+/* stat bar fill */
+.stat-track {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.focus-ring:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
+}
+
+/* phone frame */
+/* realistic iPhone-style titanium frame */
+.phone-frame {
+  background: linear-gradient(155deg, #4a4e5a 0%, #23262f 22%, #16181f 50%, #23262f 78%, #4a4e5a 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 40px 90px rgba(0, 0, 0, 0.75),
+    inset 0 1px 1px rgba(255, 255, 255, 0.22),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.1);
+}
+
+/* inner black bezel that surrounds the screen */
+.phone-screen {
+  box-shadow: 0 0 0 2px #000, inset 0 0 12px rgba(0, 0, 0, 0.9);
+}
+
+/* metallic side buttons */
+.phone-btn {
+  background: linear-gradient(180deg, #5a5f6d, #2b2f39);
+  box-shadow: -1px 0 1px rgba(0, 0, 0, 0.5);
+}
