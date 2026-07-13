@@ -9,8 +9,10 @@ let ctx: AudioContext | null = null;
 let master: GainNode | null = null;
 let musicGain: GainNode | null = null;
 let musicTimer: ReturnType<typeof setInterval> | null = null;
+let musicEl: HTMLAudioElement | null = null;
 let step = 0;
 let initialized = false;
+const MUSIC_FILE = "/audio/music.mp3";
 
 function ensureCtx() {
   if (typeof window === "undefined") return null;
@@ -158,7 +160,38 @@ function scheduleStep() {
   step++;
 }
 
+function ensureMusicElement() {
+  if (typeof window === "undefined") return null;
+  if (!musicEl) {
+    const el = new Audio(MUSIC_FILE);
+    el.loop = true;
+    el.preload = "auto";
+    el.volume = 0.42;
+    musicEl = el;
+  }
+  return musicEl;
+}
+
 function startMusic() {
+  // Prefer real music track if available in /public/audio/music.mp3.
+  // If not available (404 or blocked), fallback to synth loop.
+  const el = ensureMusicElement();
+  if (el) {
+    el.currentTime = 0;
+    void el.play().then(() => {
+      if (musicTimer) {
+        clearInterval(musicTimer);
+        musicTimer = null;
+      }
+    }).catch(() => {
+      const c = ensureCtx();
+      if (!c || !musicGain || musicTimer) return;
+      musicGain.gain.cancelScheduledValues(c.currentTime);
+      musicGain.gain.linearRampToValueAtTime(0.6, c.currentTime + 1.2);
+      musicTimer = setInterval(scheduleStep, 200);
+    });
+    return;
+  }
   const c = ensureCtx();
   if (!c || !musicGain || musicTimer) return;
   musicGain.gain.cancelScheduledValues(c.currentTime);
@@ -167,6 +200,9 @@ function startMusic() {
 }
 
 function stopMusic() {
+  if (musicEl) {
+    musicEl.pause();
+  }
   const c = ensureCtx();
   if (musicGain && c) {
     musicGain.gain.cancelScheduledValues(c.currentTime);

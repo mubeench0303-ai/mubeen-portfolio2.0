@@ -67,12 +67,12 @@ export default function Contact() {
                       whileInView={{ opacity: 1, x: 0 }}
                       viewport={{ once: true }}
                       transition={{ delay: i * 0.1 }}
-                      className="focus-ring flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-4 py-3.5 transition-colors hover:border-gta-cyan"
+                      className="focus-ring grid grid-cols-[78px_minmax(0,1fr)] items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3.5 transition-colors hover:border-gta-cyan"
                     >
-                      <span className="font-mono text-xs text-white/60">
+                      <span className="font-mono text-[11px] uppercase tracking-wide text-white/60">
                         {c.label}
                       </span>
-                      <span className="font-mono text-xs text-white">
+                      <span className="min-w-0 break-all text-right font-mono text-[11px] leading-4 text-white">
                         {c.value}
                       </span>
                     </motion.a>

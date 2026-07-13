@@ -24,9 +24,12 @@ export const profile = {
   // Apna exact LinkedIn URL add kar dena
   linkedin: "https://www.linkedin.com/in/mubeen-ch",
 
+  // Instagram profile URL add kar dena
+  instagram: "https://instagram.com/your_username",
+
   // Resume PDF ko public folder mein rakh kar:
   // resumeUrl: "/Mubeen-Resume.pdf"
-  resumeUrl: "#",
+  resumeUrl: "/Muhammad_Mubeen_Resume.pdf",
 
   // Apni image public folder mein profile.jpg naam se add karo
   image: "/pic5.jpg.jpeg",
@@ -351,7 +354,7 @@ export const missions: Mission[] = [
     ],
 
     // Portfolio deploy karne ke baad live link add karna
-    liveUrl: "#",
+    liveUrl: "https://mubeench-gold.vercel.app/",
 
     // Portfolio GitHub par push karne ke baad repository link add karna
     githubUrl: "#",
@@ -471,6 +474,14 @@ export const contacts = [
     value: "www.linkedin.com/in/mubeen-ch",
 
     href: profile.linkedin,
+  },
+
+  {
+    label: "Instagram",
+
+    value: "instagram.com/your_username",
+
+    href: profile.instagram,
   },
 ];
 

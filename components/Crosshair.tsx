@@ -37,13 +37,24 @@ export default function Crosshair() {
         queued = true;
         raf = requestAnimationFrame(apply);
       }
-      // only re-render when the aim state actually flips
-      const overUI = !!(e.target as HTMLElement)?.closest(
-        "a,button,input,textarea"
-      );
+    };
+
+    const interactiveSel =
+      "a,button,input,textarea,select,[role='button'],[data-cursor='aim']";
+    const onOver = (e: PointerEvent) => {
+      const overUI = !!(e.target as HTMLElement)?.closest(interactiveSel);
       if (overUI !== aimingRef.current) {
         aimingRef.current = overUI;
         setAiming(overUI);
+      }
+    };
+    const onOut = (e: PointerEvent) => {
+      const fromUI = !!(e.target as HTMLElement)?.closest(interactiveSel);
+      const toUI =
+        !!(e.relatedTarget as HTMLElement | null)?.closest?.(interactiveSel);
+      if (fromUI && !toUI && aimingRef.current) {
+        aimingRef.current = false;
+        setAiming(false);
       }
     };
     const onAim = (e: Event) => {
@@ -62,10 +73,14 @@ export default function Crosshair() {
     };
 
     window.addEventListener("pointermove", move, { passive: true });
+    window.addEventListener("pointerover", onOver, { passive: true });
+    window.addEventListener("pointerout", onOut, { passive: true });
     window.addEventListener("gta:aim", onAim as EventListener);
     window.addEventListener("gta:shot", onShot);
     return () => {
       window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerover", onOver);
+      window.removeEventListener("pointerout", onOut);
       window.removeEventListener("gta:aim", onAim as EventListener);
       window.removeEventListener("gta:shot", onShot);
       cancelAnimationFrame(raf);
@@ -88,10 +103,10 @@ export default function Crosshair() {
     <div
       ref={ref}
       className="pointer-events-none fixed left-0 top-0 z-[90]"
-      style={{ willChange: "transform" }}
+      style={{ willChange: "transform", contain: "layout style paint" }}
     >
       <div
-        className="relative -translate-x-1/2 -translate-y-1/2 transition-transform duration-100"
+        className="relative -translate-x-1/2 -translate-y-1/2 transition-transform duration-75"
         style={{
           transform: `${aiming ? "scale(1.35) rotate(45deg)" : "scale(1)"} ${
             recoil ? "scale(1.4)" : ""

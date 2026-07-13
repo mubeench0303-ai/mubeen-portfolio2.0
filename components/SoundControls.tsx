@@ -8,6 +8,7 @@ import { setMusic, setSfx, useGameStore } from "@/lib/gameStore";
 export default function SoundControls() {
   const { sfxOn, musicOn } = useGameStore();
   const lastHover = useRef<Element | null>(null);
+  const lastHoverAt = useRef(0);
 
   useEffect(() => {
     initAudio();
@@ -16,7 +17,12 @@ export default function SoundControls() {
       const el = (e.target as HTMLElement)?.closest("a,button");
       if (el && el !== lastHover.current) {
         lastHover.current = el;
-        sfx.hover();
+        // Prevent dense hover sounds from stacking and causing tiny jank.
+        const now = performance.now();
+        if (now - lastHoverAt.current > 80) {
+          lastHoverAt.current = now;
+          sfx.hover();
+        }
       }
     };
     const onClick = (e: Event) => {
