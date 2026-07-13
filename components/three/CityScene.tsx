@@ -159,10 +159,12 @@ function MissionBuilding({
   mission,
   position,
   color,
+  interactive,
 }: {
   mission: (typeof missions)[number];
   position: [number, number, number];
   color: string;
+  interactive: boolean;
 }) {
   const [hover, setHover] = useState(false);
   const matRef = useRef<THREE.MeshStandardMaterial>(null);
@@ -183,15 +185,18 @@ function MissionBuilding({
     <group
       position={position}
       onPointerOver={(e) => {
+        if (!interactive) return;
         e.stopPropagation();
         setHover(true);
         setAiming(true);
       }}
       onPointerOut={() => {
+        if (!interactive) return;
         setHover(false);
         setAiming(false);
       }}
       onClick={(e) => {
+        if (!interactive) return;
         e.stopPropagation();
         openMission(mission.id);
       }}
@@ -219,7 +224,7 @@ function MissionBuilding({
   );
 }
 
-function MissionDistrict() {
+function MissionDistrict({ interactive }: { interactive: boolean }) {
   return (
     <group>
       {missions.map((m, i) => (
@@ -228,6 +233,7 @@ function MissionDistrict() {
           mission={m}
           color={NEON[i % NEON.length]}
           position={[i % 2 === 0 ? -11 : 11, 0, -20 - i * 22]}
+          interactive={interactive}
         />
       ))}
     </group>
@@ -487,9 +493,11 @@ function SkyLights() {
 function SceneContents({
   scrollRef,
   quality,
+  missionInteractive,
 }: {
   scrollRef: MutableRefObject<number>;
   quality: Quality;
+  missionInteractive: boolean;
 }) {
   return (
     <>
@@ -497,7 +505,7 @@ function SceneContents({
       <Stars radius={130} depth={60} count={quality === "low" ? 800 : 1700} factor={4} saturation={0} fade speed={1} />
       <Ground quality={quality} />
       <Buildings quality={quality} />
-      <MissionDistrict />
+      <MissionDistrict interactive={missionInteractive} />
       <CarTrails count={quality === "low" ? 7 : 14} />
       <Car />
       {quality === "high" && <Rain />}
@@ -518,11 +526,29 @@ function SceneContents({
 
 export default function CityScene() {
   const scrollRef = useScrollProgressRef();
+  const [missionInteractive, setMissionInteractive] = useState(false);
   const [quality] = useState<Quality>(() => {
     if (typeof window === "undefined") return "high";
     const coarse = window.matchMedia("(pointer: coarse)").matches;
     return window.innerWidth < 768 || coarse ? "low" : "high";
   });
+
+  useEffect(() => {
+    const missionEl = document.getElementById("missions");
+    if (!missionEl) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setMissionInteractive(entry.isIntersecting);
+        if (!entry.isIntersecting) {
+          // Ensure crosshair does not stay in aim state after leaving section.
+          setAiming(false);
+        }
+      },
+      { rootMargin: "-35% 0px -35% 0px" }
+    );
+    observer.observe(missionEl);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <div className="bg-canvas-wrap">
@@ -532,7 +558,11 @@ export default function CityScene() {
         dpr={quality === "low" ? [1, 1.3] : [1, 1.5]}
         performance={{ min: 0.5 }}
       >
-        <SceneContents scrollRef={scrollRef} quality={quality} />
+        <SceneContents
+          scrollRef={scrollRef}
+          quality={quality}
+          missionInteractive={missionInteractive}
+        />
       </Canvas>
     </div>
   );

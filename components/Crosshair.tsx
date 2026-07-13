@@ -103,16 +103,19 @@ export default function Crosshair() {
     <div
       ref={ref}
       className="pointer-events-none fixed left-0 top-0 z-[90]"
-      style={{ willChange: "transform", contain: "layout style paint" }}
+      style={{ willChange: "transform" }}
     >
-      <div
-        className="relative -translate-x-1/2 -translate-y-1/2 transition-transform duration-75"
-        style={{
-          transform: `${aiming ? "scale(1.35) rotate(45deg)" : "scale(1)"} ${
-            recoil ? "scale(1.4)" : ""
-          }`,
-        }}
-      >
+      {/* keep centering on a dedicated wrapper so animation transforms
+          never override the -50%/-50% alignment */}
+      <div className="absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2">
+        <div
+          className="relative transition-transform duration-75"
+          style={{
+            transform: `${aiming ? "scale(1.35) rotate(45deg)" : "scale(1)"} ${
+              recoil ? "scale(1.4)" : ""
+            }`,
+          }}
+        >
         <svg
           width="40"
           height="40"
@@ -137,6 +140,7 @@ export default function Crosshair() {
           <line x1="28" y1="20" x2="38" y2="20" stroke="currentColor" strokeWidth="1.5" />
           <circle cx="20" cy="20" r="1.5" fill="currentColor" />
         </svg>
+        </div>
       </div>
     </div>
   );

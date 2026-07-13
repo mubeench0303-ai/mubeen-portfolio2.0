@@ -51,7 +51,7 @@ export default function Hero() {
       >
         <button
           onClick={() => go("missions")}
-          className="focus-ring hud-chip bg-gta-pink px-8 py-3 font-mono text-sm font-bold uppercase tracking-widest text-white transition-transform hover:scale-105"
+          className="focus-ring hud-chip bg-gta-pink px-8 py-3 font-mono text-sm font-bold uppercase tracking-widest text-white transition-colors transition-transform hover:scale-105 hover:bg-gta-cyan"
         >
           Start Game
         </button>
