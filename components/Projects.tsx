@@ -4,6 +4,7 @@ import { ExternalLink, Github, Star } from "lucide-react";
 import SectionHeading from "./SectionHeading";
 import Reveal from "./Reveal";
 import { missions } from "@/lib/data";
+import { openMission } from "@/lib/events";
 
 export default function Projects() {
   return (
@@ -14,7 +15,19 @@ export default function Projects() {
         <div className="grid gap-6 md:grid-cols-2">
           {missions.map((m, i) => (
             <Reveal key={m.id} delay={(i % 2) * 0.1}>
-              <article className="mission-card hud-panel group relative h-full overflow-hidden rounded-2xl p-6">
+              <article
+                className="mission-card hud-panel group relative h-full cursor-pointer overflow-hidden rounded-2xl p-6"
+                onClick={() => openMission(m.id)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    openMission(m.id);
+                  }
+                }}
+                role="button"
+                tabIndex={0}
+                aria-label={`Open mission details for ${m.name}`}
+              >
                 {/* status ribbon */}
                 <span
                   className={`absolute right-0 top-4 px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-widest ${
@@ -71,6 +84,7 @@ export default function Projects() {
                       href={m.githubUrl}
                       target="_blank"
                       rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
                       className="focus-ring text-muted transition-colors hover:text-white"
                       aria-label="Source code"
                     >
@@ -80,6 +94,7 @@ export default function Projects() {
                       href={m.liveUrl}
                       target="_blank"
                       rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
                       className="focus-ring text-muted transition-colors hover:text-gta-cyan"
                       aria-label="Live demo"
                     >

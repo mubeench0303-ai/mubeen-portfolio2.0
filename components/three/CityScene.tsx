@@ -534,20 +534,41 @@ export default function CityScene() {
   });
 
   useEffect(() => {
-    const missionEl = document.getElementById("missions");
-    if (!missionEl) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setMissionInteractive(entry.isIntersecting);
-        if (!entry.isIntersecting) {
-          // Ensure crosshair does not stay in aim state after leaving section.
-          setAiming(false);
+    let observer: IntersectionObserver | null = null;
+    let raf = 0;
+    let attempts = 0;
+
+    const attach = () => {
+      const missionEl = document.getElementById("missions");
+      if (!missionEl) {
+        attempts += 1;
+        if (attempts < 180) raf = requestAnimationFrame(attach);
+        return;
+      }
+
+      observer = new IntersectionObserver(
+        ([entry]) => {
+          setMissionInteractive(entry.isIntersecting);
+          if (!entry.isIntersecting) {
+            // Ensure crosshair does not stay in aim state after leaving section.
+            setAiming(false);
+          }
+        },
+        {
+          // Keep mission hitboxes active through most of the section, while still
+          // preventing accidental interactions in Hero/top area.
+          rootMargin: "-10% 0px -10% 0px",
+          threshold: 0.01,
         }
-      },
-      { rootMargin: "-35% 0px -35% 0px" }
-    );
-    observer.observe(missionEl);
-    return () => observer.disconnect();
+      );
+      observer.observe(missionEl);
+    };
+
+    attach();
+    return () => {
+      cancelAnimationFrame(raf);
+      observer?.disconnect();
+    };
   }, []);
 
   return (
